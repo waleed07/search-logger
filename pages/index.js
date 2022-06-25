@@ -10,10 +10,11 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import React, { useState, useEffect, useRef } from "react";
 import DataTable from "react-data-table-component";
-import moment from 'moment';
+import moment from "moment";
+import Spinner from "react-bootstrap/Spinner";
 export default function Home({ data }) {
   const [audit, setAuditData] = useState(null);
-  // const [pending, setPending] = useState(true);
+  const [pending, setPending] = useState(true);
   const [actionTypeSelect, setActionTypeSelect] = useState("");
   const [applicationTypeSelect, setApplicationTypeSelect] = useState("");
 
@@ -24,25 +25,28 @@ export default function Home({ data }) {
 
   useEffect(() => {
     // console.log(data.result.auditLog)
+
     setAuditData(data.result.auditLog);
     let at = data.result.auditLog
       .map((item) => item.actionType)
-      .filter((value, index, self) => value !== null && self.indexOf(value) === index);
+      .filter(
+        (value, index, self) => value !== null && self.indexOf(value) === index
+      );
     let ap = data.result.auditLog
       .map((item) => item.applicationType)
-      .filter((value, index, self) => value !== null && self.indexOf(value) === index);
+      .filter(
+        (value, index, self) => value !== null && self.indexOf(value) === index
+      );
     setActionTypeSelect(at);
-    setApplicationTypeSelect(ap)
-    
+    setApplicationTypeSelect(ap);
   }, []);
 
-  // useEffect(() => {
-  // 	const timeout = setTimeout(() => {
-  // 		setAuditData(data.result.auditLog);
-  // 		setPending(false);
-  // 	}, 2000);
-  // 	return () => clearTimeout(timeout);
-  // }, []);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setPending(false);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const columns = [
     {
@@ -75,7 +79,8 @@ export default function Home({ data }) {
     {
       name: "Date:Time",
       sortable: true,
-      selector: (row) => moment(row.creationTimestamp).format('YYYY-MM-DD / HH:mm:ss'),
+      selector: (row) =>
+        moment(row.creationTimestamp).format("YYYY-MM-DD / HH:mm:ss"),
     },
   ];
 
@@ -83,45 +88,46 @@ export default function Home({ data }) {
     e.preventDefault();
     let actionT = String(actionType.current.value);
     let applicationT = String(applicationType.current.value);
-    let fromD = selectDate.current.value !== "" && moment(selectDate.current.value).format('YYYY-MM-DD');
+    let fromD =
+      selectDate.current.value !== "" &&
+      moment(selectDate.current.value).format("YYYY-MM-DD");
     let applicationID = String(applicationId.current.value);
-    // let filter = {
-    //   actionT,
-    //   applicationT,
-    //   fromD,
-    //   toD,
-    //   applicationID,
-    // };
+
     // console.log(applicationId.current.value)
     let filterResult = data.result.auditLog.filter((f) => {
-      let con1 = actionT !== '' && (f.actionType !== null && f.actionType.match(actionT));
-      let con2 = applicationT !== '' && (f.applicationType !== null && f.applicationType.match(applicationT));
-      let apid = applicationID !== '' && f.applicationId !== null ? String(f.applicationId) : null
-      let con3 = (apid !== null && apid.match(applicationID));
-      let creationDate = moment(f.creationTimestamp).format('YYYY-MM-DD');
-      let con4 = fromD !== '' && (creationDate === fromD);
-      console.log('date ---',fromD)
+      let con1 =
+        actionT !== "" && f.actionType !== null && f.actionType.match(actionT);
+      let con2 =
+        applicationT !== "" &&
+        f.applicationType !== null &&
+        f.applicationType.match(applicationT);
+      let apid =
+        applicationID !== "" && f.applicationId !== null
+          ? String(f.applicationId)
+          : null;
+      let con3 = apid !== null && apid.match(applicationID);
+      let creationDate = moment(f.creationTimestamp).format("YYYY-MM-DD");
+      let con4 = fromD !== "" && creationDate === fromD;
+      console.log("date ---", fromD);
       if (con1 || con2 || con3 || con4) {
         return f;
       }
-      
 
       // return false;
-      
     });
     // if(filterResult.length > 0 ){
     //   setAuditData(filterResult)
     // }else{
     //   setAuditData(data.result.auditLog)
     // }
-    setAuditData(filterResult)
-    
+    setAuditData(filterResult);
+
     // console.log('filterResult ',filterResult);
-  }
+  };
   const handleReset = (e) => {
     e.preventDefault();
-    setAuditData(data.result.auditLog)
-  }
+    setAuditData(data.result.auditLog);
+  };
   return (
     <Container fluid>
       <Head>
@@ -138,11 +144,14 @@ export default function Home({ data }) {
                 <Form.Label>Action Type</Form.Label>
                 <Form.Select name="actionType" id="actionType" ref={actionType}>
                   <option value="">Select Action Type</option>
-                  {
-                    actionTypeSelect && actionTypeSelect.map((value,key)=>{
-                      return <option value={value} key={key}>{value}</option>
-                    })
-                  }
+                  {actionTypeSelect &&
+                    actionTypeSelect.map((value, key) => {
+                      return (
+                        <option value={value} key={key}>
+                          {value}
+                        </option>
+                      );
+                    })}
                 </Form.Select>
               </Col>
               <Col lg="2" md="2" xs="12">
@@ -153,11 +162,14 @@ export default function Home({ data }) {
                   ref={applicationType}
                 >
                   <option value="">Select Application Type</option>
-                  {
-                    applicationTypeSelect && applicationTypeSelect.map((value,key)=>{
-                      return <option value={value} key={key}>{value}</option>
-                    })
-                  }
+                  {applicationTypeSelect &&
+                    applicationTypeSelect.map((value, key) => {
+                      return (
+                        <option value={value} key={key}>
+                          {value}
+                        </option>
+                      );
+                    })}
                 </Form.Select>
               </Col>
               <Col lg="2" md="2" xs="12">
@@ -185,23 +197,30 @@ export default function Home({ data }) {
                 />
               </Col>
               <Col lg="2" md="2" xs="12">
-                <div className="d-grid gap-2" style={{marginTop:'2rem'}}>
-                  <Button onClick={handleSubmit} variant="primary" size="md" active>
+                <div className="d-grid gap-2" style={{ marginTop: "2rem" }}>
+                  <Button
+                    onClick={handleSubmit}
+                    variant="primary"
+                    size="md"
+                    active
+                  >
                     Search Logger
                   </Button>
                 </div>
-                
               </Col>
               <Col lg="2" md="2" xs="12">
-                <div className="d-grid gap-2" style={{marginTop:'2rem'}}>
-                  <Button onClick={handleReset} variant="secondary" size="md" active>
+                <div className="d-grid gap-2" style={{ marginTop: "2rem" }}>
+                  <Button
+                    onClick={handleReset}
+                    variant="secondary"
+                    size="md"
+                    active
+                  >
                     Reset
                   </Button>
                 </div>
-                
               </Col>
             </Row>
-        
           </Card.Body>
         </Card>
       </div>
@@ -209,7 +228,15 @@ export default function Home({ data }) {
       <div className="mx-3 my-5 justify-content-md-center">
         <Card>
           <Card.Body>
-            {audit && <DataTable columns={columns} data={audit} pagination />}
+            {audit && (
+              <DataTable
+                columns={columns}
+                data={audit}
+                pagination
+                progressPending={pending}
+                progressComponent={<Loader />}
+              />
+            )}
           </Card.Body>
         </Card>
       </div>
@@ -235,4 +262,12 @@ export async function getStaticProps() {
       data,
     },
   };
+}
+
+export function Loader() {
+  return (
+    <>
+      <Spinner animation="grow" />
+    </>
+  );
 }
