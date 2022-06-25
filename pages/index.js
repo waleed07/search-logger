@@ -108,7 +108,7 @@ export default function Home({ data }) {
       let con3 = apid !== null && apid.match(applicationID);
       let creationDate = moment(f.creationTimestamp).format("YYYY-MM-DD");
       let con4 = fromD !== "" && creationDate === fromD;
-      console.log("date ---", fromD);
+      // console.log("date ---", fromD);
       if (con1 || con2 || con3 || con4) {
         return f;
       }
@@ -247,10 +247,9 @@ export default function Home({ data }) {
 // This function gets called at build time on server-side.
 // It won't be called on client-side, so you can even do
 // direct database queries.
-export async function getStaticProps() {
+export const getStaticProps = async () => {
   // Call an external API endpoint to get posts.
   // You can use any data fetching library
-
   const res = await fetch(
     "https://run.mocky.io/v3/a2fbc23e-069e-4ba5-954c-cd910986f40f"
   );
@@ -262,7 +261,7 @@ export async function getStaticProps() {
       data,
     },
   };
-}
+};
 
 export function Loader() {
   return (
